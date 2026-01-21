@@ -270,8 +270,11 @@ function dateToJD(year, month, day, hour, minute, tzOffsetHours) {
 }
 
 function jdToDate(jd, tzOffsetHours) {
-    const z = Math.floor(jd + 0.5);
-    const f = jd + 0.5 - z;
+    // Add timezone offset to JD before conversion
+    const adjustedJd = jd + tzOffsetHours / 24;
+    
+    const z = Math.floor(adjustedJd + 0.5);
+    const f = adjustedJd + 0.5 - z;
     
     let a;
     if (z < 2299161) {
@@ -286,16 +289,16 @@ function jdToDate(jd, tzOffsetHours) {
     const d = Math.floor(365.25 * c);
     const e = Math.floor((b - d) / 30.6001);
     
-    const day = b - d - Math.floor(30.6001 * e);
+    let day = b - d - Math.floor(30.6001 * e);
     const month = e < 14 ? e - 1 : e - 13;
     const year = month > 2 ? c - 4716 : c - 4715;
     
-    const utcHour = f * 24;
-    const localHour = utcHour + tzOffsetHours;
+    // Extract time from fractional part
+    let totalHours = f * 24;
     
-    const hours = Math.floor(localHour);
-    const minutes = Math.floor((localHour - hours) * 60);
-    const seconds = Math.floor(((localHour - hours) * 60 - minutes) * 60);
+    const hours = Math.floor(totalHours);
+    const minutes = Math.floor((totalHours - hours) * 60);
+    const seconds = Math.floor(((totalHours - hours) * 60 - minutes) * 60);
     
     return { year, month, day, hours, minutes, seconds };
 }
