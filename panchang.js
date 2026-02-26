@@ -219,13 +219,13 @@ const KARANAS_ROTATING = [
 ];
 
 const VASARAS = [
-    ["Bhanu", "भानु", "Ravi", "Nayiru", "ஞாயிறு", "Sunday"],
-    ["Soma", "सोम", "Indu", "Thingal", "திங்கள்", "Monday"],
-    ["Mangala", "मङ्गल", "Bhauma", "Sevvai", "செவ்வாய்", "Tuesday"],
-    ["Budha", "बुध", "Sowmya", "Budhan", "புதன்", "Wednesday"],
-    ["Guru", "गुरु", "Brihaspati", "Viyazhan", "வியாழன்", "Thursday"],
-    ["Shukra", "शुक्र", "Bhrigu", "Velli", "வெள்ளி", "Friday"],
-    ["Shani", "शनि", "Sthira", "Sani", "சனி", "Saturday"],
+    ["Ravi", "रवि", "Bhanu", "Nayiru", "ஞாயிறு", "Sunday"],
+    ["Indu", "इंदु", "Soma", "Thingal", "திங்கள்", "Monday"],
+    ["Bhowma", "भौम", "Mangala", "Sevvai", "செவ்வாய்", "Tuesday"],
+    ["Sowmya", "सौम्य", "Budha", "Budhan", "புதன்", "Wednesday"],
+    ["Brihaspati", "बृहस्पति", "Guru", "Viyazhan", "வியாழன்", "Thursday"],
+    ["Bhrugu", "भृगु", "Shukra", "Velli", "வெள்ளி", "Friday"],
+    ["Sthira", "स्थिर", "Shani", "Sani", "சனி", "Saturday"],
 ];
 
 const PAKSHAS = [
