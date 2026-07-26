@@ -219,7 +219,7 @@ const KARANAS_ROTATING = [
 ];
 
 const VASARAS = [
-    ["Ravi", "रवि", "Bhanu", "Nayiru", "ஞாயிறு", "Sunday"],
+    ["Bhanu", "भानु", "Ravi", "Nayiru", "ஞாயிறு", "Sunday"],
     ["Indu", "इंदु", "Soma", "Thingal", "திங்கள்", "Monday"],
     ["Bhowma", "भौम", "Mangala", "Sevvai", "செவ்வாய்", "Tuesday"],
     ["Sowmya", "सौम्य", "Budha", "Budhan", "புதன்", "Wednesday"],
@@ -691,7 +691,7 @@ const IAST_KARANAS = {
     "Vanija": "vaṇija", "Vishti": "viṣṭi"
 };
 
-const IAST_VASARAS = ["ravi", "indu", "bhauma", "saumya", "bṛhaspati", "bhṛgu", "sthira"];
+const IAST_VASARAS = ["bhānu", "indu", "bhauma", "saumya", "bṛhaspati", "bhṛgu", "sthira"];
 const IAST_PAKSHAS = ["śukla", "kṛṣṇa"];
 const IAST_AYANAS = ["uttarāyaṇa", "dakṣiṇāyana"];
 
