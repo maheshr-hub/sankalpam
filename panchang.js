@@ -219,7 +219,7 @@ const KARANAS_ROTATING = [
 ];
 
 const VASARAS = [
-    ["Bhanu", "भानु", "Ravi", "Nayiru", "ஞாயிறு", "Sunday"],
+    ["Ravi", "रवि", "Bhanu", "Nayiru", "ஞாயிறு", "Sunday"],
     ["Indu", "इंदु", "Soma", "Thingal", "திங்கள்", "Monday"],
     ["Bhowma", "भौम", "Mangala", "Sevvai", "செவ்வாய்", "Tuesday"],
     ["Sowmya", "सौम्य", "Budha", "Budhan", "புதன்", "Wednesday"],
@@ -494,7 +494,7 @@ function formatDateTime(d) {
 }
 
 // Main calculation function
-async function getPanchang(dateStr, timeStr, timezone) {
+async function getPanchangCore(dateStr, timeStr, timezone) {
     const [year, month, day] = dateStr.split('-').map(Number);
     const [hour, minute] = timeStr.split(':').map(Number);
     
@@ -634,4 +634,178 @@ async function getPanchang(dateStr, timeStr, timezone) {
             english: karana[3],
         },
     };
+}
+
+/* ============================================================
+   IAST TRANSLITERATION TABLES
+   Indices match the tables above exactly.
+   ============================================================ */
+
+const IAST_SAMVATSARAS = [
+    "prabhava", "vibhava", "śukla", "pramodūta", "prajotpatti", "āṅgirasa",
+    "śrīmukha", "bhāva", "yuva", "dhātu", "īśvara", "bahudhānya",
+    "pramāthī", "vikrama", "viṣu", "citrabhānu", "svabhānu", "tāraṇa",
+    "pārthiva", "vyaya", "sarvajit", "sarvadhārī", "virodhī", "vikṛti",
+    "khara", "nandana", "vijaya", "jaya", "manmatha", "durmukhī",
+    "hevilambī", "vilambī", "vikārī", "śārvarī", "plava", "śubhakṛt",
+    "śobhakṛt", "krodhī", "viśvāvasu", "parābhava", "plavaṅga", "kīlaka",
+    "saumya", "sādhāraṇa", "virodhikṛt", "paridhāvī", "pramādīca", "ānanda",
+    "rākṣasa", "nala", "piṅgala", "kālayukti", "siddhārthī", "raudra",
+    "durmati", "dundubhi", "rudhirodgārī", "raktākṣī", "krodhana", "akṣaya"
+];
+
+const IAST_MASAS = [
+    "meṣa", "vṛṣabha", "mithuna", "karka", "siṃha", "kanyā",
+    "tulā", "vṛścika", "dhanu", "makara", "kumbha", "mīna"
+];
+
+const IAST_RITUS = ["vasanta", "grīṣma", "varṣā", "śarad", "hemanta", "śiśira"];
+
+const IAST_TITHIS = [
+    "prathamā", "dvitīyā", "tṛtīyā", "caturthī", "pañcamī", "ṣaṣṭhī",
+    "saptamī", "aṣṭamī", "navamī", "daśamī", "ekādaśī", "dvādaśī",
+    "trayodaśī", "caturdaśī", "pūrṇimā"
+];
+const IAST_AMAVASYA = "amāvāsyā";
+
+const IAST_NAKSHATRAS = [
+    "aśvinī", "bharaṇī", "kṛttikā", "rohiṇī", "mṛgaśīrṣa", "ārdrā",
+    "punarvasu", "puṣya", "āśleṣā", "maghā", "pūrvaphalgunī", "uttaraphalgunī",
+    "hasta", "citrā", "svāti", "viśākhā", "anurādhā", "jyeṣṭhā",
+    "mūla", "pūrvāṣāḍhā", "uttarāṣāḍhā", "śravaṇa", "dhaniṣṭhā", "śatabhiṣā",
+    "pūrvabhādrapadā", "uttarabhādrapadā", "revatī"
+];
+
+const IAST_YOGAS = [
+    "viṣkumbha", "prīti", "āyuṣmān", "saubhāgya", "śobhana", "atigaṇḍa",
+    "sukarmā", "dhṛti", "śūla", "gaṇḍa", "vṛddhi", "dhruva",
+    "vyāghāta", "harṣaṇa", "vajra", "siddhi", "vyatīpāta", "varīyān",
+    "parigha", "śiva", "siddha", "sādhya", "śubha", "śukla",
+    "brahma", "indra", "vaidhṛti"
+];
+
+const IAST_KARANAS = {
+    "Shakuni": "śakuni", "Chatushpada": "catuṣpāda", "Nagava": "nāga",
+    "Kimstughna": "kiṃstughna", "Bava": "bava", "Balava": "bālava",
+    "Kaulava": "kaulava", "Taitila": "taitila", "Garaja": "garaja",
+    "Vanija": "vaṇija", "Vishti": "viṣṭi"
+};
+
+const IAST_VASARAS = ["ravi", "indu", "bhauma", "saumya", "bṛhaspati", "bhṛgu", "sthira"];
+const IAST_PAKSHAS = ["śukla", "kṛṣṇa"];
+const IAST_AYANAS = ["uttarāyaṇa", "dakṣiṇāyana"];
+
+/* Locative case helper: a-stem nouns take -e (uttarāyaṇa -> uttarāyaṇe) */
+function iastLocative(word) {
+    return word.endsWith("a") ? word.slice(0, -1) + "e" : word;
+}
+
+/* ============================================================
+   NEXT AMĀVĀSYĀ CALCULATION
+   Amāvāsyā is the 30th tithi: elongation 348° to 360°/0°.
+   ============================================================ */
+
+function elongationAt(jd) {
+    let e = (getMoonLongitude(jd) - getSunLongitude(jd)) % 360;
+    if (e < 0) e += 360;
+    return e;
+}
+
+/* Signed distance to a target angle: negative before, positive after */
+function angleDelta(jd, target) {
+    let d = (elongationAt(jd) - target + 180) % 360;
+    if (d < 0) d += 360;
+    return d - 180;
+}
+
+/* Find the next moment after startJd when elongation crosses target */
+function findNextCrossing(startJd, target, maxDays) {
+    const step = 0.02; // ~29 minutes
+    let prevJd = startJd;
+    let prevVal = angleDelta(prevJd, target);
+
+    for (let t = step; t <= maxDays; t += step) {
+        const curJd = startJd + t;
+        const curVal = angleDelta(curJd, target);
+
+        if (prevVal < 0 && curVal >= 0) {
+            // Bisect for precision (~1 second)
+            let lo = prevJd, hi = curJd;
+            for (let i = 0; i < 40; i++) {
+                const mid = (lo + hi) / 2;
+                if (angleDelta(mid, target) < 0) { lo = mid; } else { hi = mid; }
+            }
+            return (lo + hi) / 2;
+        }
+        prevJd = curJd;
+        prevVal = curVal;
+    }
+    return null;
+}
+
+const WEEKDAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+                     "July", "August", "September", "October", "November", "December"];
+
+function formatFriendly(jd, tzOffset) {
+    const d = jdToDate(jd, tzOffset);
+    const pad = n => n.toString().padStart(2, '0');
+    const weekday = WEEKDAY_NAMES[Math.floor(jd + tzOffset / 24 + 1.5) % 7];
+    return `${weekday}, ${d.day} ${MONTH_NAMES[d.month - 1]} ${d.year}, ${pad(d.hours)}:${pad(d.minutes)}`;
+}
+
+function getNextAmavasya(timezone) {
+    const nowJd = 2440587.5 + Date.now() / 86400000;
+    const tzOffset = getTimezoneOffset(timezone, new Date());
+
+    const currentElongation = elongationAt(nowJd);
+    const inAmavasyaNow = currentElongation >= 348;
+
+    let startJd, endJd, isCurrent;
+
+    if (inAmavasyaNow) {
+        // Already in Amāvāsyā: report the one in progress
+        startJd = findNextCrossing(nowJd - 1.5, 348, 3);
+        endJd = findNextCrossing(nowJd, 0, 2);
+        isCurrent = true;
+    } else {
+        startJd = findNextCrossing(nowJd, 348, 35);
+        endJd = startJd !== null ? findNextCrossing(startJd, 0, 3) : null;
+        isCurrent = false;
+    }
+
+    if (startJd === null || endJd === null) return null;
+
+    return {
+        is_current: isCurrent,
+        start_time: formatFriendly(startJd, tzOffset),
+        end_time: formatFriendly(endJd, tzOffset),
+        days_away: Math.max(0, Math.round((startJd - nowJd) * 10) / 10)
+    };
+}
+
+/* ============================================================
+   PUBLIC ENTRY POINT
+   Wraps the core calculation and adds IAST plus Amāvāsyā data.
+   ============================================================ */
+
+async function getPanchang(dateStr, timeStr, timezone) {
+    const p = await getPanchangCore(dateStr, timeStr, timezone);
+
+    p.samvatsara.iast = IAST_SAMVATSARAS[p.samvatsara.index];
+    p.ayana.iast = IAST_AYANAS[p.ayana.index];
+    p.ritu.iast = IAST_RITUS[p.ritu.index];
+    p.masa.iast = IAST_MASAS[p.masa.index];
+    p.paksha.iast = IAST_PAKSHAS[p.paksha.index];
+    p.tithi.iast = p.tithi.index === 29
+        ? IAST_AMAVASYA
+        : IAST_TITHIS[p.tithi.index < 15 ? p.tithi.index : p.tithi.index - 15];
+    p.vasara.iast = IAST_VASARAS[p.vasara.index];
+    p.nakshatra.iast = IAST_NAKSHATRAS[p.nakshatra.index];
+    p.yoga.iast = IAST_YOGAS[p.yoga.index];
+    p.karana.iast = IAST_KARANAS[p.karana.sanskrit] || p.karana.sanskrit.toLowerCase();
+
+    p.next_amavasya = getNextAmavasya(timezone);
+
+    return p;
 }

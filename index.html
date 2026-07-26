@@ -1,436 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#8B4513">
-    <meta name="description" content="Calculate daily Sankalpam mantras for Hindu rituals">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Sankalpam">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <title>Sankalpam Calculator</title>
-    <style>
-        :root {
-            --primary: #8B4513;
-            --primary-light: #D2691E;
-            --bg: #FFF8DC;
-            --card-bg: #FFFFFF;
-            --text: #333333;
-            --text-light: #666666;
-            --border: #DEB887;
-            --sanskrit: #800000;
-            --tamil: #006400;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 16px;
-            padding-bottom: 80px;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        
-        h1 {
-            color: var(--primary);
-            font-size: 1.8rem;
-            margin-bottom: 4px;
-        }
-        
-        .subtitle {
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-        
-        .input-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
-        }
-        
-        .input-group {
-            margin-bottom: 16px;
-        }
-        
-        .input-group:last-child {
-            margin-bottom: 0;
-        }
-        
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--primary);
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            background: white;
-        }
-        
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-        
-        .btn:hover {
-            background: var(--primary-light);
-        }
-        
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .result-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid var(--border);
-        }
-        
-        .result-card h2 {
-            color: var(--primary);
-            font-size: 1.2rem;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--border);
-        }
-        
-        .sanskrit-text {
-            font-size: 1.1rem;
-            line-height: 2;
-            color: var(--sanskrit);
-        }
-        
-        .tamil-text {
-            font-size: 1.1rem;
-            line-height: 2;
-            color: var(--tamil);
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            color: var(--text-light);
-        }
-        
-        .info-value {
-            font-weight: 600;
-        }
-        
-        .timing-section {
-            margin-top: 12px;
-            padding: 12px;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
-        
-        .timing-title {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-        
-        .timing-row {
-            font-size: 0.9rem;
-            color: var(--text-light);
-        }
-        
-        .tabs {
-            display: flex;
-            margin-bottom: 16px;
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 4px;
-            border: 1px solid var(--border);
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: 500;
-            color: var(--text-light);
-        }
-        
-        .tab.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-light);
-        }
-        
-        .error {
-            background: #fee;
-            border: 1px solid #f00;
-            color: #c00;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-        }
-        
-        #results {
-            display: none;
-        }
-        
-        @media (max-width: 400px) {
-            h1 { font-size: 1.5rem; }
-            .input-card, .result-card { padding: 16px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#8C1C13">
+<meta name="description" content="Calculate the daily Sankalpam from exact astronomical positions">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sankalpam">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Sankalpam</title>
+<style>
+:root{
+  --maroon:#8C1C13;
+  --maroon-dark:#5C1010;
+  --saffron:#E8A33D;
+  --gold:#C9A227;
+  --gold-light:#F5D372;
+  --cream:#FDF6E3;
+  --paper:#FFFDF7;
+  --ink:#3A2A1A;
+  --ink-soft:#7A6A57;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--cream);
+  background-image:radial-gradient(circle at 50% 0%, #FBEBCB 0%, var(--cream) 55%);
+  color:var(--ink);
+  min-height:100vh;
+  padding:14px 14px 40px;
+}
+.container{max-width:620px;margin:0 auto}
+
+/* ---------- Header ---------- */
+header{text-align:center;margin-bottom:22px}
+.crest{width:78px;height:78px;margin:0 auto 6px;display:block}
+h1{
+  font-family:Georgia,'Times New Roman',serif;
+  color:var(--maroon);
+  font-size:1.75rem;
+  letter-spacing:.02em;
+}
+.title-deva{
+  font-size:1.1rem;color:var(--gold);
+  margin-top:2px;letter-spacing:.06em;
+}
+.subtitle{color:var(--ink-soft);font-size:.85rem;margin-top:6px}
+
+/* ---------- Ornament ---------- */
+.ornament{
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;margin:16px 0;color:var(--gold);
+}
+.ornament::before,.ornament::after{
+  content:"";height:1px;flex:1;max-width:130px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.ornament span{font-size:.9rem}
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--paper);
+  border:1px solid #E8D9B5;
+  border-top:3px solid var(--maroon);
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 2px 10px rgba(92,16,16,.07);
+}
+.card h2{
+  font-family:Georgia,serif;
+  color:var(--maroon);
+  font-size:1.05rem;
+  letter-spacing:.03em;
+  margin-bottom:14px;
+  padding-bottom:8px;
+  border-bottom:1px solid #EADFC4;
+  display:flex;align-items:center;gap:8px;
+}
+.card h2 .mark{color:var(--saffron);font-size:1.15rem}
+
+/* ---------- Inputs ---------- */
+.field{margin-bottom:14px}
+.field:last-of-type{margin-bottom:0}
+label{
+  display:block;font-weight:600;font-size:.82rem;
+  text-transform:uppercase;letter-spacing:.07em;
+  color:var(--maroon);margin-bottom:6px;
+}
+input,select{
+  width:100%;padding:12px;border:1.5px solid #E0CDA4;
+  border-radius:8px;font-size:16px;background:#fff;color:var(--ink);
+}
+input:focus,select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,163,61,.18)}
+.btn{
+  width:100%;padding:14px;margin-top:18px;
+  background:linear-gradient(180deg,var(--maroon),var(--maroon-dark));
+  color:var(--gold-light);border:none;border-radius:8px;
+  font-size:1rem;font-weight:600;letter-spacing:.06em;cursor:pointer;
+}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{background:#bdb2a0;color:#fff;cursor:not-allowed}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:4px;margin-bottom:14px;
+  background:var(--paper);border:1px solid #E8D9B5;
+  border-radius:10px;padding:4px;
+}
+.tab{
+  flex:1;padding:10px 4px;text-align:center;border:none;
+  background:transparent;cursor:pointer;border-radius:7px;
+  font-weight:600;font-size:.9rem;color:var(--ink-soft);
+}
+.tab.active{background:var(--maroon);color:var(--gold-light)}
+
+/* ---------- Sankalpam text ---------- */
+.verse{line-height:2.05;font-size:1.12rem}
+.verse.deva{color:var(--maroon-dark)}
+.verse.tamil{color:#0B5D3B}
+.verse.iast{color:var(--maroon-dark);font-family:Georgia,serif;font-style:italic}
+.verse .gloss{
+  display:block;font-size:.72rem;font-style:normal;
+  color:var(--ink-soft);line-height:1.3;margin-bottom:6px;
+  letter-spacing:.03em;text-transform:uppercase;
+}
+.verse .line{margin-bottom:4px}
+
+/* ---------- Timing ---------- */
+.timing{
+  background:#FBF3DF;border:1px solid #EEE0BE;
+  border-left:3px solid var(--saffron);
+  border-radius:8px;padding:12px;margin-bottom:10px;
+}
+.timing:last-child{margin-bottom:0}
+.timing .name{font-weight:700;color:var(--maroon);margin-bottom:6px}
+.timing .row{font-size:.88rem;color:var(--ink-soft);display:flex;justify-content:space-between}
+.timing .row span:last-child{color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* ---------- Amavasya ---------- */
+.amavasya{
+  background:linear-gradient(180deg,#2B1B14,#1A100C);
+  border:1px solid var(--gold);border-top:3px solid var(--gold);
+  color:#F3E6C8;
+}
+.amavasya h2{color:var(--gold-light);border-bottom-color:rgba(201,162,39,.35)}
+.amavasya .moon{
+  width:46px;height:46px;border-radius:50%;
+  background:#120A07;border:1.5px solid rgba(201,162,39,.55);
+  box-shadow:inset -6px -4px 12px rgba(0,0,0,.8),0 0 16px rgba(201,162,39,.18);
+  margin:2px auto 12px;
+}
+.amavasya .when{text-align:center;font-size:.8rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.amavasya .row{display:flex;justify-content:space-between;padding:7px 0;
+  border-bottom:1px solid rgba(201,162,39,.18);font-size:.92rem}
+.amavasya .row:last-child{border-bottom:none}
+.amavasya .row span:first-child{color:rgba(243,230,200,.6)}
+
+.error{background:#FBE9E7;border:1px solid var(--maroon);color:var(--maroon);
+  padding:12px;border-radius:8px;margin-bottom:14px}
+.hidden{display:none}
+#results{display:none}
+footer{text-align:center;color:var(--ink-soft);font-size:.72rem;margin-top:22px;line-height:1.6}
+@media(max-width:400px){h1{font-size:1.45rem}.card{padding:15px}.verse{font-size:1.05rem}}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🙏 Sankalpam Calculator</h1>
-            <p class="subtitle">Daily Panchang for Hindu Rituals</p>
-        </header>
-        
-        <div class="input-card">
-            <div class="input-group">
-                <label for="date">Date</label>
-                <input type="date" id="date">
-            </div>
-            <div class="input-group">
-                <label for="time">Time</label>
-                <input type="time" id="time" value="08:00">
-            </div>
-            <div class="input-group">
-                <label for="timezone">Timezone</label>
-                <select id="timezone">
-                    <option value="Asia/Kolkata">India (IST)</option>
-                    <option value="Australia/Brisbane">Brisbane (AEST)</option>
-                    <option value="Australia/Sydney">Sydney (AEDT)</option>
-                    <option value="Australia/Melbourne">Melbourne (AEDT)</option>
-                    <option value="Australia/Perth">Perth (AWST)</option>
-                    <option value="Asia/Singapore">Singapore (SGT)</option>
-                    <option value="Asia/Kuala_Lumpur">Malaysia (MYT)</option>
-                    <option value="Europe/London">London (GMT/BST)</option>
-                    <option value="America/New_York">New York (EST/EDT)</option>
-                    <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
-                    <option value="America/Chicago">Chicago (CST/CDT)</option>
-                    <option value="Pacific/Auckland">Auckland (NZST)</option>
-                    <option value="Asia/Dubai">Dubai (GST)</option>
-                    <option value="Asia/Tokyo">Tokyo (JST)</option>
-                </select>
-            </div>
-            <button class="btn" id="calculate" onclick="calculate()">Calculate Sankalpam</button>
-        </div>
-        
-        <div id="error" class="error hidden"></div>
-        
-        <div id="results">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('sanskrit')">संस्कृत</button>
-                <button class="tab" onclick="showTab('tamil')">தமிழ்</button>
-                <button class="tab" onclick="showTab('english')">English</button>
-            </div>
-            
-            <div id="sanskrit-tab" class="result-card">
-                <h2>संकल्पम्</h2>
-                <div id="sanskrit-content" class="sanskrit-text"></div>
-            </div>
-            
-            <div id="tamil-tab" class="result-card hidden">
-                <h2>சங்கல்பம்</h2>
-                <div id="tamil-content" class="tamil-text"></div>
-            </div>
-            
-            <div id="english-tab" class="result-card hidden">
-                <h2>Sankalpam Details</h2>
-                <div id="english-content"></div>
-            </div>
-            
-            <div class="result-card">
-                <h2>⏰ Timing</h2>
-                <div class="timing-section">
-                    <div class="timing-title" id="tithi-name">Tithi</div>
-                    <div class="timing-row" id="tithi-start"></div>
-                    <div class="timing-row" id="tithi-end"></div>
-                </div>
-                <div class="timing-section">
-                    <div class="timing-title" id="nakshatra-name">Nakshatra</div>
-                    <div class="timing-row" id="nakshatra-start"></div>
-                    <div class="timing-row" id="nakshatra-end"></div>
-                </div>
-            </div>
-        </div>
+<div class="container">
+
+  <header>
+    <svg class="crest" viewBox="0 0 512 512" aria-hidden="true">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#F5D372"/><stop offset="100%" stop-color="#C9A227"/>
+        </linearGradient>
+      </defs>
+      <g fill="url(#g1)">
+        <g id="p"><path d="M256 78C238 122 238 152 256 178C274 152 274 122 256 78Z"/></g>
+        <use href="#p" transform="rotate(45 256 256)"/>
+        <use href="#p" transform="rotate(90 256 256)"/>
+        <use href="#p" transform="rotate(135 256 256)"/>
+        <use href="#p" transform="rotate(180 256 256)"/>
+        <use href="#p" transform="rotate(225 256 256)"/>
+        <use href="#p" transform="rotate(270 256 256)"/>
+        <use href="#p" transform="rotate(315 256 256)"/>
+      </g>
+      <circle cx="256" cy="256" r="118" fill="#E8A33D"/>
+      <circle cx="256" cy="256" r="118" fill="none" stroke="#F5D372" stroke-width="7"/>
+      <text x="256" y="316" text-anchor="middle" font-size="176" fill="#5C1010">ॐ</text>
+    </svg>
+    <h1>Sankalpam</h1>
+    <div class="title-deva">॥ सङ्कल्पः ॥</div>
+    <p class="subtitle">Pañcāṅga computed from exact planetary positions</p>
+  </header>
+
+  <div class="card">
+    <h2><span class="mark">✦</span> Date &amp; Place</h2>
+    <div class="field">
+      <label for="date">Date</label>
+      <input type="date" id="date">
     </div>
-    
-    <script src="panchang.js"></script>
-    <script>
-        // Register service worker for offline support
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-        
-        // Set default date to today
-        document.getElementById('date').valueAsDate = new Date();
-        
-        // Try to detect user's timezone
-        const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const tzSelect = document.getElementById('timezone');
-        for (let option of tzSelect.options) {
-            if (option.value === userTz) {
-                option.selected = true;
-                break;
-            }
-        }
-        
-        function showTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('[id$="-tab"]').forEach(t => t.classList.add('hidden'));
-            
-            event.target.classList.add('active');
-            document.getElementById(tab + '-tab').classList.remove('hidden');
-        }
-        
-        async function calculate() {
-            const btn = document.getElementById('calculate');
-            const errorDiv = document.getElementById('error');
-            const resultsDiv = document.getElementById('results');
-            
-            btn.disabled = true;
-            btn.textContent = 'Calculating...';
-            errorDiv.classList.add('hidden');
-            resultsDiv.style.display = 'none';
-            
-            try {
-                const date = document.getElementById('date').value;
-                const time = document.getElementById('time').value;
-                const timezone = document.getElementById('timezone').value;
-                
-                if (!date) {
-                    throw new Error('Please select a date');
-                }
-                
-                const panchang = await getPanchang(date, time, timezone);
-                displayResults(panchang);
-                resultsDiv.style.display = 'block';
-                
-            } catch (err) {
-                errorDiv.textContent = err.message;
-                errorDiv.classList.remove('hidden');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Calculate Sankalpam';
-            }
-        }
-        
-        function displayResults(p) {
-            // Sanskrit script
-            document.getElementById('sanskrit-content').innerHTML = `
-                ${p.samvatsara.sanskrit_script} संवत्सरे<br>
-                ${p.ayana.sanskrit_script}े<br>
-                ${p.ritu.sanskrit_script} ऋतौ<br>
-                ${p.masa.sanskrit_script} मासे<br>
-                ${p.paksha.sanskrit_script} पक्षे<br>
-                ${p.tithi.sanskrit_script} शुभ तिथौ<br>
-                ${p.vasara.sanskrit_script} वासर युक्तायाम्<br>
-                ${p.nakshatra.sanskrit_script} नक्षत्र युक्तायाम्<br>
-                ${p.yoga.sanskrit_script} योग<br>
-                ${p.karana.sanskrit_script} करण
-            `;
-            
-            // Tamil script
-            document.getElementById('tamil-content').innerHTML = `
-                ${p.samvatsara.tamil_script} வருடம்<br>
-                ${p.ayana.tamil_script}<br>
-                ${p.ritu.tamil_script} ருது<br>
-                ${p.masa.tamil_script} மாதம்<br>
-                ${p.paksha.tamil_script} பக்ஷம்<br>
-                ${p.tithi.tamil_script} திதி<br>
-                ${p.vasara.tamil_script} கிழமை<br>
-                ${p.nakshatra.tamil_script} நக்ஷத்திரம்<br>
-                ${p.yoga.tamil_script} யோகம்<br>
-                ${p.karana.tamil_script} கரணம்
-            `;
-            
-            // English
-            document.getElementById('english-content').innerHTML = `
-                <div class="info-row"><span class="info-label">Year</span><span class="info-value">${p.samvatsara.sanskrit} (${p.samvatsara.english})</span></div>
-                <div class="info-row"><span class="info-label">Ayana</span><span class="info-value">${p.ayana.sanskrit} (${p.ayana.english})</span></div>
-                <div class="info-row"><span class="info-label">Season</span><span class="info-value">${p.ritu.sanskrit} (${p.ritu.english})</span></div>
-                <div class="info-row"><span class="info-label">Month</span><span class="info-value">${p.masa.sanskrit} / ${p.masa.tamil}</span></div>
-                <div class="info-row"><span class="info-label">Fortnight</span><span class="info-value">${p.paksha.sanskrit} (${p.paksha.english})</span></div>
-                <div class="info-row"><span class="info-label">Tithi</span><span class="info-value">${p.tithi.sanskrit} (${p.tithi.english})</span></div>
-                <div class="info-row"><span class="info-label">Weekday</span><span class="info-value">${p.vasara.tamil} (${p.vasara.english})</span></div>
-                <div class="info-row"><span class="info-label">Nakshatra</span><span class="info-value">${p.nakshatra.tamil} (${p.nakshatra.sanskrit})</span></div>
-                <div class="info-row"><span class="info-label">Yoga</span><span class="info-value">${p.yoga.sanskrit}</span></div>
-                <div class="info-row"><span class="info-label">Karana</span><span class="info-value">${p.karana.sanskrit}</span></div>
-            `;
-            
-            // Timing
-            document.getElementById('tithi-name').textContent = `Tithi: ${p.tithi.sanskrit}`;
-            document.getElementById('tithi-start').textContent = `Start: ${p.tithi.start_time}`;
-            document.getElementById('tithi-end').textContent = `End: ${p.tithi.end_time}`;
-            
-            document.getElementById('nakshatra-name').textContent = `Nakshatra: ${p.nakshatra.tamil}`;
-            document.getElementById('nakshatra-start').textContent = `Start: ${p.nakshatra.start_time}`;
-            document.getElementById('nakshatra-end').textContent = `End: ${p.nakshatra.end_time}`;
-        }
-    </script>
+    <div class="field">
+      <label for="time">Time</label>
+      <input type="time" id="time" value="08:00">
+    </div>
+    <div class="field">
+      <label for="timezone">Timezone</label>
+      <select id="timezone">
+        <option value="Australia/Brisbane" selected>Brisbane (AEST)</option>
+        <option value="Asia/Kolkata">India (IST)</option>
+        <option value="Australia/Sydney">Sydney (AEDT)</option>
+        <option value="Australia/Melbourne">Melbourne (AEDT)</option>
+        <option value="Australia/Perth">Perth (AWST)</option>
+        <option value="Asia/Singapore">Singapore (SGT)</option>
+        <option value="Asia/Kuala_Lumpur">Malaysia (MYT)</option>
+        <option value="Europe/London">London (GMT/BST)</option>
+        <option value="America/New_York">New York (EST/EDT)</option>
+        <option value="America/Chicago">Chicago (CST/CDT)</option>
+        <option value="America/Los_Angeles">Los Angeles (PST/PDT)</option>
+        <option value="Pacific/Auckland">Auckland (NZST)</option>
+        <option value="Asia/Dubai">Dubai (GST)</option>
+        <option value="Asia/Tokyo">Tokyo (JST)</option>
+      </select>
+    </div>
+    <button class="btn" id="calculate" onclick="calculate()">Calculate Sankalpam</button>
+  </div>
+
+  <div id="error" class="error hidden"></div>
+
+  <div id="results">
+    <div class="ornament"><span>❖</span></div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="deva" onclick="showTab('deva',this)">संस्कृत</button>
+      <button class="tab" data-tab="tamil" onclick="showTab('tamil',this)">தமிழ்</button>
+      <button class="tab" data-tab="iast" onclick="showTab('iast',this)">IAST</button>
+    </div>
+
+    <div id="deva-tab" class="card">
+      <h2><span class="mark">✦</span> सङ्कल्पः</h2>
+      <div id="deva-content" class="verse deva"></div>
+    </div>
+
+    <div id="tamil-tab" class="card hidden">
+      <h2><span class="mark">✦</span> சங்கல்பம்</h2>
+      <div id="tamil-content" class="verse tamil"></div>
+    </div>
+
+    <div id="iast-tab" class="card hidden">
+      <h2><span class="mark">✦</span> Saṅkalpaḥ (IAST)</h2>
+      <div id="iast-content" class="verse iast"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="mark">✦</span> Timings</h2>
+      <div class="timing">
+        <div class="name" id="tithi-name"></div>
+        <div class="row"><span>Begins</span><span id="tithi-start"></span></div>
+        <div class="row"><span>Ends</span><span id="tithi-end"></span></div>
+      </div>
+      <div class="timing">
+        <div class="name" id="nakshatra-name"></div>
+        <div class="row"><span>Begins</span><span id="nakshatra-start"></span></div>
+        <div class="row"><span>Ends</span><span id="nakshatra-end"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ornament"><span>❖</span></div>
+
+  <div class="card amavasya" id="amavasya-card">
+    <h2><span class="mark">☾</span> Next Amāvāsyā</h2>
+    <div class="moon"></div>
+    <div class="when" id="amavasya-when">calculating…</div>
+    <div class="row"><span>Begins</span><span id="amavasya-start">—</span></div>
+    <div class="row"><span>Ends (new moon)</span><span id="amavasya-end">—</span></div>
+  </div>
+
+  <footer>
+    Lahiri ayanāṁśa · sidereal (nirayana) positions<br>
+    Timings are indicative; confirm with your family pañcāṅgam for vratas.
+  </footer>
+</div>
+
+<script src="panchang.js"></script>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}
+
+document.getElementById('date').valueAsDate = new Date();
+
+function showTab(tab, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  ['deva','tamil','iast'].forEach(t=>document.getElementById(t+'-tab').classList.add('hidden'));
+  btn.classList.add('active');
+  document.getElementById(tab+'-tab').classList.remove('hidden');
+}
+
+async function calculate(){
+  const btn = document.getElementById('calculate');
+  const errorDiv = document.getElementById('error');
+  const resultsDiv = document.getElementById('results');
+
+  btn.disabled = true; btn.textContent = 'Calculating…';
+  errorDiv.classList.add('hidden');
+
+  try{
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const timezone = document.getElementById('timezone').value;
+    if(!date) throw new Error('Please select a date');
+
+    const p = await getPanchang(date, time, timezone);
+    displayResults(p);
+    displayAmavasya(p.next_amavasya);
+    resultsDiv.style.display = 'block';
+  }catch(err){
+    errorDiv.textContent = err.message;
+    errorDiv.classList.remove('hidden');
+  }finally{
+    btn.disabled = false; btn.textContent = 'Calculate Sankalpam';
+  }
+}
+
+function displayResults(p){
+  document.getElementById('deva-content').innerHTML = `
+    <div class="line">${p.samvatsara.sanskrit_script} संवत्सरे</div>
+    <div class="line">${p.ayana.sanskrit_script}े</div>
+    <div class="line">${p.ritu.sanskrit_script} ऋतौ</div>
+    <div class="line">${p.masa.sanskrit_script} मासे</div>
+    <div class="line">${p.paksha.sanskrit_script} पक्षे</div>
+    <div class="line">${p.tithi.sanskrit_script} शुभ तिथौ</div>
+    <div class="line">${p.vasara.sanskrit_script} वासर युक्तायाम्</div>
+    <div class="line">${p.nakshatra.sanskrit_script} नक्षत्र युक्तायाम्</div>
+    <div class="line">${p.yoga.sanskrit_script} योगे</div>
+    <div class="line">${p.karana.sanskrit_script} करणे</div>`;
+
+  document.getElementById('tamil-content').innerHTML = `
+    <div class="line">${p.samvatsara.tamil_script} வருடம்</div>
+    <div class="line">${p.ayana.tamil_script}</div>
+    <div class="line">${p.ritu.tamil_script} ருது</div>
+    <div class="line">${p.masa.tamil_script} மாதம்</div>
+    <div class="line">${p.paksha.tamil_script} பக்ஷம்</div>
+    <div class="line">${p.tithi.tamil_script} திதி</div>
+    <div class="line">${p.vasara.tamil_script} கிழமை</div>
+    <div class="line">${p.nakshatra.tamil_script} நக்ஷத்திரம்</div>
+    <div class="line">${p.yoga.tamil_script} யோகம்</div>
+    <div class="line">${p.karana.tamil_script} கரணம்</div>`;
+
+  const loc = w => w.endsWith('a') ? w.slice(0,-1)+'e' : w;
+  document.getElementById('iast-content').innerHTML = `
+    <div class="line"><span class="gloss">year</span>${p.samvatsara.iast} saṃvatsare</div>
+    <div class="line"><span class="gloss">ayana</span>${loc(p.ayana.iast)}</div>
+    <div class="line"><span class="gloss">season</span>${p.ritu.iast} ṛtau</div>
+    <div class="line"><span class="gloss">month</span>${p.masa.iast} māse</div>
+    <div class="line"><span class="gloss">fortnight</span>${p.paksha.iast} pakṣe</div>
+    <div class="line"><span class="gloss">tithi</span>${p.tithi.iast} śubha tithau</div>
+    <div class="line"><span class="gloss">weekday</span>${p.vasara.iast} vāsara yuktāyām</div>
+    <div class="line"><span class="gloss">nakṣatra</span>${p.nakshatra.iast} nakṣatra yuktāyām</div>
+    <div class="line"><span class="gloss">yoga</span>${p.yoga.iast} yoge</div>
+    <div class="line"><span class="gloss">karaṇa</span>${p.karana.iast} karaṇe</div>`;
+
+  document.getElementById('tithi-name').textContent = `Tithi — ${p.tithi.iast} (${p.tithi.english})`;
+  document.getElementById('tithi-start').textContent = p.tithi.start_time;
+  document.getElementById('tithi-end').textContent = p.tithi.end_time;
+
+  document.getElementById('nakshatra-name').textContent = `Nakṣatra — ${p.nakshatra.iast} / ${p.nakshatra.tamil}`;
+  document.getElementById('nakshatra-start').textContent = p.nakshatra.start_time;
+  document.getElementById('nakshatra-end').textContent = p.nakshatra.end_time;
+}
+
+function displayAmavasya(a){
+  if(!a){document.getElementById('amavasya-when').textContent='unavailable';return;}
+  document.getElementById('amavasya-when').textContent =
+    a.is_current ? 'in progress now' :
+    (a.days_away < 1 ? 'later today' : `in about ${Math.round(a.days_away)} days`);
+  document.getElementById('amavasya-start').textContent = a.start_time;
+  document.getElementById('amavasya-end').textContent = a.end_time;
+}
+
+// Populate the Amāvāsyā panel on load, and calculate today's sankalpam
+window.addEventListener('load', () => {
+  try{ displayAmavasya(getNextAmavasya(document.getElementById('timezone').value)); }catch(e){}
+  calculate();
+});
+document.getElementById('timezone').addEventListener('change', () => {
+  try{ displayAmavasya(getNextAmavasya(document.getElementById('timezone').value)); }catch(e){}
+});
+</script>
 </body>
 </html>

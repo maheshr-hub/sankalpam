@@ -4,8 +4,8 @@
     "description": "Calculate daily Sankalpam mantras for Hindu rituals",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#FFF8DC",
-    "theme_color": "#8B4513",
+    "background_color": "#FDF6E3",
+    "theme_color": "#8C1C13",
     "orientation": "portrait-primary",
     "icons": [
         {
