@@ -668,6 +668,15 @@ const IAST_TITHIS = [
 ];
 const IAST_AMAVASYA = "amāvāsyā";
 
+/* Locative forms of the tithi names, as used in the sankalpa sentence
+   (ā-stems take -āyām, ī-stems take -yām) */
+const IAST_TITHIS_LOC = [
+    "prathamāyām", "dvitīyāyām", "tṛtīyāyām", "caturthyām", "pañcamyām", "ṣaṣṭhyām",
+    "saptamyām", "aṣṭamyām", "navamyām", "daśamyām", "ekādaśyām", "dvādaśyām",
+    "trayodaśyām", "caturdaśyām", "pūrṇimāyām"
+];
+const IAST_AMAVASYA_LOC = "amāvāsyāyām";
+
 const IAST_NAKSHATRAS = [
     "aśvinī", "bharaṇī", "kṛttikā", "rohiṇī", "mṛgaśīrṣa", "ārdrā",
     "punarvasu", "puṣya", "āśleṣā", "maghā", "pūrvaphalgunī", "uttaraphalgunī",
@@ -800,10 +809,26 @@ async function getPanchang(dateStr, timeStr, timezone) {
     p.tithi.iast = p.tithi.index === 29
         ? IAST_AMAVASYA
         : IAST_TITHIS[p.tithi.index < 15 ? p.tithi.index : p.tithi.index - 15];
+    p.tithi.iast_locative = p.tithi.index === 29
+        ? IAST_AMAVASYA_LOC
+        : IAST_TITHIS_LOC[p.tithi.index < 15 ? p.tithi.index : p.tithi.index - 15];
     p.vasara.iast = IAST_VASARAS[p.vasara.index];
     p.nakshatra.iast = IAST_NAKSHATRAS[p.nakshatra.index];
     p.yoga.iast = IAST_YOGAS[p.yoga.index];
     p.karana.iast = IAST_KARANAS[p.karana.sanskrit] || p.karana.sanskrit.toLowerCase();
+
+    p.recital = [
+        p.samvatsara.iast + " nāma saṃvatsare",
+        iastLocative(p.ayana.iast),
+        p.ritu.iast + " ṛtau",
+        p.masa.iast + " māse",
+        p.paksha.iast + " pakṣe",
+        "adya " + p.tithi.iast_locative + " puṇya tithau",
+        p.vasara.iast + " vāsara yuktāyām",
+        p.nakshatra.iast + " nakṣatra yuktāyām",
+        "śubha yoga śubha karaṇa evaṃ guṇa viśeṣeṇa viśiṣṭāyām",
+        "asyām " + p.tithi.iast_locative + " puṇya tithau"
+    ].join(", ");
 
     p.next_amavasya = getNextAmavasya(timezone);
 

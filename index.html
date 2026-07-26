@@ -130,6 +130,22 @@ input:focus,select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0
 }
 .verse .line{margin-bottom:4px}
 
+/* ---------- Recital ---------- */
+.recital-card{border-top-color:var(--saffron);background:#FFFBF0}
+.recital{
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:1.06rem;line-height:1.95;color:var(--maroon-dark);
+  text-align:justify;
+}
+.copy-btn{
+  margin-top:14px;width:100%;padding:10px;
+  background:#fff;border:1.5px solid var(--gold);
+  color:var(--maroon);border-radius:8px;
+  font-size:.85rem;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;
+}
+.copy-btn:active{background:#FBF3DF}
+
 /* ---------- Timing ---------- */
 .timing{
   background:#FBF3DF;border:1px solid #EEE0BE;
@@ -256,6 +272,12 @@ footer{text-align:center;color:var(--ink-soft);font-size:.72rem;margin-top:22px;
       <div id="iast-content" class="verse iast"></div>
     </div>
 
+    <div class="card recital-card">
+      <h2><span class="mark">✦</span> Saṅkalpa Vākyam</h2>
+      <div class="recital" id="recital-content"></div>
+      <button class="copy-btn" id="copy-btn" onclick="copyRecital()">Copy text</button>
+    </div>
+
     <div class="card">
       <h2><span class="mark">✦</span> Timings</h2>
       <div class="timing">
@@ -364,6 +386,8 @@ function displayResults(p){
     <div class="line"><span class="gloss">yoga</span>${p.yoga.iast} yoge</div>
     <div class="line"><span class="gloss">karaṇa</span>${p.karana.iast} karaṇe</div>`;
 
+  document.getElementById('recital-content').textContent = p.recital;
+
   document.getElementById('tithi-name').textContent = `Tithi — ${p.tithi.iast} (${p.tithi.english})`;
   document.getElementById('tithi-start').textContent = p.tithi.start_time;
   document.getElementById('tithi-end').textContent = p.tithi.end_time;
@@ -371,6 +395,22 @@ function displayResults(p){
   document.getElementById('nakshatra-name').textContent = `Nakṣatra — ${p.nakshatra.iast} / ${p.nakshatra.tamil}`;
   document.getElementById('nakshatra-start').textContent = p.nakshatra.start_time;
   document.getElementById('nakshatra-end').textContent = p.nakshatra.end_time;
+}
+
+function copyRecital(){
+  const text = document.getElementById('recital-content').textContent;
+  const btn = document.getElementById('copy-btn');
+  const done = () => { btn.textContent = 'Copied ✓'; setTimeout(()=>{btn.textContent='Copy text';},1800); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(fallback);
+  } else { fallback(); }
+  function fallback(){
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); done(); }catch(e){ btn.textContent='Copy failed'; }
+    document.body.removeChild(ta);
+  }
 }
 
 function displayAmavasya(a){
