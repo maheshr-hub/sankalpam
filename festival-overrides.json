@@ -1,0 +1,3 @@
+{
+  "_readme": "Manual overrides for the Festival Calendar tab. If the computed date for a festival ever disagrees with your family priest or drikpanchang for a specific year, add an entry here to force it. Key format is 'festivalKey:year' and value is 'YYYY-MM-DD'. Festival keys: pongal, rama_navami, panguni_uthiram, puthandu, karadaiyan_nombu, krishna_janmashtami, upakarma, vara_lakshmi, navratri, vijaya_dashami, ganesha_chaturthi, mahaalaya_paksha, mahaalaya_amavasya, deepavali, karthikai_deepam, arudra_darshanam, hanumat_jayanthi. To add a real override, add a new line like: \"deepavali:2027\": \"2027-10-29\""
+}

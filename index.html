@@ -183,12 +183,27 @@ input:focus,select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0
 #results{display:none}
 footer{text-align:center;color:var(--ink-soft);font-size:.72rem;margin-top:22px;line-height:1.6}
 @media(max-width:400px){h1{font-size:1.45rem}.card{padding:15px}.verse{font-size:1.05rem}}
+
+/* ---------- Festival Calendar entry point ---------- */
+.festival-link{
+  position:absolute;top:0;right:0;
+  display:flex;align-items:center;gap:6px;
+  background:var(--paper);border:1.5px solid var(--gold);
+  color:var(--maroon);text-decoration:none;
+  padding:8px 12px;border-radius:20px;
+  font-size:.78rem;font-weight:600;letter-spacing:.03em;
+  box-shadow:0 2px 6px rgba(92,16,16,.08);
+}
+.festival-link:active{background:#FBF3DF}
+header{position:relative}
+
 </style>
 </head>
 <body>
 <div class="container">
 
   <header>
+    <a href="festivals.html" class="festival-link">📅 Festival Calendar</a>
     <svg class="crest" viewBox="0 0 512 512" aria-hidden="true">
       <defs>
         <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">

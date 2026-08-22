@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#8C1C13">
+<meta name="description" content="Hindu festival calendar - Gregorian and Tamil dates for a chosen year">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Festival Calendar - Sankalpam</title>
+<style>
+:root{
+  --maroon:#8C1C13; --maroon-dark:#5C1010; --saffron:#E8A33D; --gold:#C9A227;
+  --gold-light:#F5D372; --cream:#FDF6E3; --paper:#FFFDF7; --ink:#3A2A1A; --ink-soft:#7A6A57;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--cream);
+  background-image:radial-gradient(circle at 50% 0%, #FBEBCB 0%, var(--cream) 55%);
+  color:var(--ink); min-height:100vh; padding:14px 14px 40px;
+}
+.container{max-width:680px;margin:0 auto}
+header{text-align:center;margin-bottom:18px;position:relative}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;color:var(--maroon);
+  text-decoration:none;font-size:.85rem;font-weight:600;margin-bottom:10px;
+}
+h1{font-family:Georgia,'Times New Roman',serif;color:var(--maroon);font-size:1.55rem;letter-spacing:.02em}
+.title-deva{font-size:1rem;color:var(--gold);margin-top:2px;letter-spacing:.06em}
+.subtitle{color:var(--ink-soft);font-size:.85rem;margin-top:6px}
+
+.card{
+  background:var(--paper); border:1px solid #E8D9B5; border-top:3px solid var(--maroon);
+  border-radius:10px; padding:18px; margin-bottom:16px; box-shadow:0 2px 10px rgba(92,16,16,.07);
+}
+.card h2{
+  font-family:Georgia,serif; color:var(--maroon); font-size:1.05rem; letter-spacing:.03em;
+  margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid #EADFC4;
+  display:flex;align-items:center;gap:8px;
+}
+.card h2 .mark{color:var(--saffron);font-size:1.15rem}
+
+.field{margin-bottom:14px}
+.field:last-of-type{margin-bottom:0}
+label{display:block;font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.07em;color:var(--maroon);margin-bottom:6px}
+input,select{width:100%;padding:12px;border:1.5px solid #E0CDA4;border-radius:8px;font-size:16px;background:#fff;color:var(--ink)}
+input:focus,select:focus{outline:none;border-color:var(--saffron);box-shadow:0 0 0 3px rgba(232,163,61,.18)}
+.btn{
+  width:100%;padding:14px;margin-top:6px;
+  background:linear-gradient(180deg,var(--maroon),var(--maroon-dark));
+  color:var(--gold-light);border:none;border-radius:8px;
+  font-size:1rem;font-weight:600;letter-spacing:.06em;cursor:pointer;
+}
+.btn:active{transform:translateY(1px)}
+
+.tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--paper);border:1px solid #E8D9B5;border-radius:10px;padding:4px}
+.tab{flex:1;padding:10px 4px;text-align:center;border:none;background:transparent;cursor:pointer;border-radius:7px;font-weight:600;font-size:.9rem;color:var(--ink-soft)}
+.tab.active{background:var(--maroon);color:var(--gold-light)}
+
+.fest-row{
+  background:#FFFBF0;border:1px solid #EEE0BE;border-left:3px solid var(--saffron);
+  border-radius:8px;padding:12px 14px;margin-bottom:10px;
+}
+.fest-row:last-child{margin-bottom:0}
+.fest-row .fname{font-weight:700;color:var(--maroon);font-size:1rem;margin-bottom:4px}
+.fest-row .fname .script{font-weight:400;font-size:.82rem;color:var(--ink-soft);margin-left:6px}
+.fest-row .dates{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;font-size:.88rem}
+.fest-row .dates .item{display:flex;flex-direction:column}
+.fest-row .dates .item .k{color:var(--ink-soft);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+.fest-row .dates .item .v{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
+.fest-row.overridden{border-left-color:var(--gold)}
+.fest-row.overridden .fname::after{content:" (manual override)";font-weight:400;font-size:.72rem;color:var(--gold);text-transform:none;letter-spacing:0}
+.fest-row.flagged{border-left-color:var(--maroon)}
+.fest-row.flagged .fname::after{content:" (check manually - unusual tithi timing)";font-weight:400;font-size:.72rem;color:var(--maroon);text-transform:none;letter-spacing:0}
+
+.error{background:#FBE9E7;border:1px solid var(--maroon);color:var(--maroon);padding:12px;border-radius:8px;margin-bottom:14px}
+.hidden{display:none}
+.loading{text-align:center;color:var(--ink-soft);padding:20px;font-size:.9rem}
+footer{text-align:center;color:var(--ink-soft);font-size:.72rem;margin-top:22px;line-height:1.6}
+@media(max-width:400px){h1{font-size:1.3rem}.card{padding:15px}.fest-row .dates{gap:10px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <a href="index.html" class="back-link">&larr; Back to Sankalpam</a>
+    <h1>Festival Calendar</h1>
+    <div class="title-deva">॥ उत्सव पञ्चाङ्गम् ॥</div>
+    <p class="subtitle">Gregorian and Tamil dates, computed from exact planetary positions</p>
+  </header>
+
+  <div class="card">
+    <h2><span class="mark">✦</span> Year &amp; Place</h2>
+    <div class="field">
+      <label for="year">Year</label>
+      <input type="number" id="year" min="1900" max="2199" step="1">
+    </div>
+    <div class="field">
+      <label for="city">Location</label>
+      <select id="city"></select>
+    </div>
+    <button class="btn" id="calculate">Calculate Festival Dates</button>
+  </div>
+
+  <div id="error" class="error hidden"></div>
+
+  <div id="scriptTabs" class="tabs hidden">
+    <button class="tab active" data-tab="iast" onclick="showScript('iast',this)">IAST</button>
+    <button class="tab" data-tab="deva" onclick="showScript('deva',this)">संस्कृत</button>
+    <button class="tab" data-tab="tamil" onclick="showScript('tamil',this)">தமிழ்</button>
+  </div>
+
+  <div id="loading" class="loading hidden">Computing panchāṅga positions for the whole year&hellip;</div>
+
+  <div id="results"></div>
+
+  <footer>
+    Computed with simplified astronomical algorithms (Lahiri ayanāṃśa, drik gaṇita). Results typically match standard pañcāṅgas within a few minutes for timing. If a date ever disagrees with your family priest, edit <code>festival-overrides.json</code> in the repository to force it.
+  </footer>
+</div>
+
+<script src="panchang.js"></script>
+<script src="festivals-engine.js"></script>
+<script>
+let currentScript = 'iast';
+let currentResults = null;
+let overridesCache = null;
+
+function populateCitySelect() {
+  const sel = document.getElementById('city');
+  sel.innerHTML = FESTIVAL_CITIES.map(c => `<option value="${c.key}">${c.label}</option>`).join('');
+  sel.value = 'chennai';
+}
+
+async function loadOverrides() {
+  if (overridesCache) return overridesCache;
+  try {
+    const res = await fetch('festival-overrides.json');
+    const json = await res.json();
+    overridesCache = json;
+  } catch (e) {
+    overridesCache = {};
+  }
+  return overridesCache;
+}
+
+function showScript(tab, btn) {
+  currentScript = tab;
+  document.querySelectorAll('#scriptTabs .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (currentResults) renderResults(currentResults);
+}
+
+const WEEKDAY_NAMES_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTH_NAMES_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function formatGregorian(y, m, d) {
+  if (!y) return 'N/A';
+  const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  return `${WEEKDAY_NAMES_EN[dow]}, ${d} ${MONTH_NAMES_EN[m - 1]} ${y}`;
+}
+
+/* Tamil solar calendar day-of-month for a given (noon) Julian Day. */
+function tamilSolarDayNumber(jdNoon) {
+  const rashiIndex = Math.floor(getSunLongitude(jdNoon) / 30);
+  const targetDeg = rashiIndex * 30;
+  const startJd = genericCrossing(getSunLongitude, jdNoon - 35, targetDeg, 40);
+  if (startJd === null) return { masaIndex: rashiIndex, day: null };
+  return { masaIndex: rashiIndex, day: Math.floor(jdNoon - startJd) + 1 };
+}
+
+const MASAS_LOCAL = ["Mesha","Vrishabha","Mithuna","Karka","Simha","Kanya","Tula","Vrischika","Dhanu","Makara","Kumbha","Meena"];
+
+/* Which moment governs each festival's tithi/nakshatra display - must match
+   the vyapti actually used by festivals-engine.js's FESTIVAL_DEFINITIONS,
+   or the displayed tithi can silently disagree with the date shown (the
+   tithi/paksha often changes between sunrise and madhyahna). */
+const VYAPTI_BY_KEY = {
+  pongal: 'sunrise', rama_navami: 'madhyahna', panguni_uthiram: 'sunrise',
+  puthandu: 'sunrise', karadaiyan_nombu: 'sunrise', krishna_janmashtami: 'sunrise',
+  upakarma: 'sunrise', vara_lakshmi: 'sunrise', navratri: 'sunrise',
+  vijaya_dashami: 'sunrise', ganesha_chaturthi: 'madhyahna', mahaalaya_paksha: 'sunrise',
+  mahaalaya_amavasya: 'sunrise', deepavali: 'sunrise', karthikai_deepam: 'sunrise',
+  arudra_darshanam: 'sunrise', hanumat_jayanthi: 'sunrise'
+};
+const NAKSHATRA_DETERMINED_KEYS = new Set(['arudra_darshanam']);
+
+function scriptLabel(entry) {
+  if (currentScript === 'deva') return entry.deva;
+  if (currentScript === 'tamil') return entry.tamil;
+  return entry.iast;
+}
+
+/* Build the IAST/Devanagari/Tamil label for a festival's line, including the
+   Tamil solar date and the tithi/nakshatra detail for that day. Evaluates
+   tithi/paksha at the SAME moment (sunrise or madhyahna) that actually
+   determined the date, since the tithi can change between the two. */
+function buildDetailLine(r, cityLat, cityLon, cityTzOffset) {
+  if (!r.year) return { greg: 'N/A', tamilSolar: '', tithi: '' };
+  const jdNoon = dateToJD(r.year, r.month, r.day, 12, 0, cityTzOffset);
+  const tsd = tamilSolarDayNumber(jdNoon);
+  const masaLabelSets = {
+    iast: IAST_MASAS[tsd.masaIndex], deva: MASAS[tsd.masaIndex][1], tamil: MASAS[tsd.masaIndex][3]
+  };
+  const tamilSolarStr = `${scriptLabel(masaLabelSets)} ${tsd.day !== null ? tsd.day : '?'}`;
+
+  const vyapti = VYAPTI_BY_KEY[r.key] || 'sunrise';
+  const determinantJd = vyapti === 'madhyahna'
+    ? madhyahnaJD(r.year, r.month, r.day, cityLat, cityLon, cityTzOffset)
+    : sunriseJD(r.year, r.month, r.day, cityLat, cityLon, cityTzOffset);
+  const evalJd = determinantJd !== null ? determinantJd : jdNoon;
+
+  if (NAKSHATRA_DETERMINED_KEYS.has(r.key)) {
+    const moonLong = getMoonLongitude(evalJd);
+    const nakIndex = Math.floor(moonLong / 13.333333333333334);
+    const nakLabelSets = { iast: IAST_NAKSHATRAS[nakIndex], deva: NAKSHATRAS[nakIndex][1], tamil: NAKSHATRAS[nakIndex][3] };
+    return { greg: formatGregorian(r.year, r.month, r.day), tamilSolar: tamilSolarStr, tithi: scriptLabel(nakLabelSets) + ' nakṣatra' };
+  }
+
+  const sunLong = getSunLongitude(evalJd), moonLong = getMoonLongitude(evalJd);
+  let elong = (moonLong - sunLong) % 360; if (elong < 0) elong += 360;
+  const tithiIndex = Math.floor(elong / 12);
+  const pakshaIndex = elong < 180 ? 0 : 1;
+  const tithiArr = tithiIndex < 15 ? TITHIS_SHUKLA : TITHIS_KRISHNA;
+  const tithiRow = tithiArr[tithiIndex < 15 ? tithiIndex : tithiIndex - 15];
+  const pakshaRow = PAKSHAS[pakshaIndex];
+  const pakshaLabelSets = { iast: IAST_PAKSHAS[pakshaIndex], deva: pakshaRow[1], tamil: pakshaRow[3] };
+  const tithiLabelSets = {
+    iast: tithiIndex === 29 ? IAST_AMAVASYA : IAST_TITHIS[tithiIndex < 15 ? tithiIndex : tithiIndex - 15],
+    deva: tithiRow[1], tamil: tithiRow[2]
+  };
+  const tithiStr = `${scriptLabel(pakshaLabelSets)} ${scriptLabel(tithiLabelSets)}`;
+
+  return { greg: formatGregorian(r.year, r.month, r.day), tamilSolar: tamilSolarStr, tithi: tithiStr };
+}
+
+function renderResults(results) {
+  const { list, cityLat, cityLon, cityTzOffset } = results;
+  const container = document.getElementById('results');
+  container.innerHTML = list.map(r => {
+    const detail = buildDetailLine(r, cityLat, cityLon, cityTzOffset);
+    const cls = r.overridden ? 'overridden' : (r.flagged ? 'flagged' : '');
+    return `<div class="fest-row ${cls}">
+      <div class="fname">${r.name}</div>
+      <div class="dates">
+        <div class="item"><span class="k">Gregorian</span><span class="v">${detail.greg}</span></div>
+        <div class="item"><span class="k">Tamil Solar</span><span class="v">${detail.tamilSolar}</span></div>
+        <div class="item"><span class="k">Tithi / Nakshatra</span><span class="v">${detail.tithi}</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function calculate() {
+  const errorEl = document.getElementById('error');
+  const loadingEl = document.getElementById('loading');
+  const resultsEl = document.getElementById('results');
+  const scriptTabsEl = document.getElementById('scriptTabs');
+  errorEl.classList.add('hidden');
+  resultsEl.innerHTML = '';
+  scriptTabsEl.classList.add('hidden');
+  loadingEl.classList.remove('hidden');
+
+  try {
+    const year = parseInt(document.getElementById('year').value, 10);
+    if (!year || year < 1900 || year > 2199) throw new Error('Please enter a valid year');
+    const cityKey = document.getElementById('city').value;
+    const city = FESTIVAL_CITIES.find(c => c.key === cityKey);
+    const overrides = await loadOverrides();
+
+    const list = await computeFestivalYear(year, cityKey, overrides);
+    const cityTzOffset = getTimezoneOffset(city.tz, new Date(year, 5, 15));
+
+    currentResults = { list, cityLat: city.lat, cityLon: city.lon, cityTzOffset };
+    renderResults(currentResults);
+    scriptTabsEl.classList.remove('hidden');
+  } catch (e) {
+    errorEl.textContent = e.message || 'Something went wrong computing the festival calendar.';
+    errorEl.classList.remove('hidden');
+  } finally {
+    loadingEl.classList.add('hidden');
+  }
+}
+
+document.getElementById('calculate').addEventListener('click', calculate);
+document.getElementById('year').value = new Date().getFullYear();
+populateCitySelect();
+</script>
+</body>
+</html>
