@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sankalpam-v6';
+const CACHE_NAME = 'sankalpam-v7';
 const ASSETS = [
     '/',
     '/index.html',
@@ -7,7 +7,8 @@ const ASSETS = [
     '/icon-192.png',
     '/icon-512.png',
     '/festivals.html',
-    '/festivals-engine.js'
+    '/festivals-engine.js',
+    '/formulae.html'
 ];
 /* festival-overrides.json is intentionally NOT precached - it's meant to be
    hand-edited, so it's always fetched fresh over the network below rather
