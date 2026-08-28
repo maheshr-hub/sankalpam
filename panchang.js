@@ -99,7 +99,7 @@ const MASAS = [
 const RITUS = [
     ["Vasanta", "वसन्त", "Ilavenil", "இளவேனில்", "Spring"],
     ["Grishma", "ग्रीष्म", "Mudhuvenil", "முதுவேனில்", "Summer"],
-    ["Varsha", "वर्षा", "Kaar", "கார்", "Monsoon"],
+    ["Varsha", "वर्ष", "Kaar", "கார்", "Monsoon"],
     ["Sharad", "शरद्", "Kulir", "குளிர்", "Autumn"],
     ["Hemanta", "हेमन्त", "Munpani", "முன்பனி", "Pre-Winter"],
     ["Shishira", "शिशिर", "Pinpani", "பின்பனி", "Winter"],
@@ -165,7 +165,7 @@ const NAKSHATRAS = [
     ["Uttara Ashadha", "उत्तराषाढा", "Uthiradam", "உத்திராடம்", "Uttara Ashadha"],
     ["Shravana", "श्रवण", "Thiruvonam", "திருவோணம்", "Shravana"],
     ["Dhanishta", "धनिष्ठा", "Avittam", "அவிட்டம்", "Dhanishta"],
-    ["Shatabhisha", "शतभिषा", "Sathayam", "சதயம்", "Shatabhisha"],
+    ["Shatabhishak", "शतभिषक्", "Sathayam", "சதயம்", "Shatabhishak"],
     ["Purva Bhadrapada", "पूर्वभाद्रपदा", "Poorattathi", "பூரட்டாதி", "Purva Bhadrapada"],
     ["Uttara Bhadrapada", "उत्तरभाद्रपदा", "Uthirattathi", "உத்திரட்டாதி", "Uttara Bhadrapada"],
     ["Revati", "रेवती", "Revathi", "ரேவதி", "Revati"],
@@ -659,7 +659,7 @@ const IAST_MASAS = [
     "tulā", "vṛścika", "dhanu", "makara", "kumbha", "mīna"
 ];
 
-const IAST_RITUS = ["vasanta", "grīṣma", "varṣā", "śarad", "hemanta", "śiśira"];
+const IAST_RITUS = ["vasanta", "grīṣma", "varṣa", "śarad", "hemanta", "śiśira"];
 
 const IAST_TITHIS = [
     "prathamā", "dvitīyā", "tṛtīyā", "caturthī", "pañcamī", "ṣaṣṭhī",
@@ -677,11 +677,98 @@ const IAST_TITHIS_LOC = [
 ];
 const IAST_AMAVASYA_LOC = "amāvāsyāyām";
 
+/* Locative forms of the Devanagari tithi names, same ā-stem/ī-stem pattern. */
+const DEVA_TITHIS_LOC = [
+    "प्रथमायाम्", "द्वितीयायाम्", "तृतीयायाम्", "चतुर्थ्याम्", "पञ्चम्याम्", "षष्ठ्याम्",
+    "सप्तम्याम्", "अष्टम्याम्", "नवम्याम्", "दशम्याम्", "एकादश्याम्", "द्वादश्याम्",
+    "त्रयोदश्याम्", "चतुर्दश्याम्", "पूर्णिमायाम्"
+];
+const DEVA_AMAVASYA_LOC = "अमावस्यायाम्";
+
+/* IAST -> Tamil (Grantha-extended) transliteration, for rendering the exact
+   same Sanskrit sankalpa sentence in Tamil script that the Devanagari/IAST
+   tabs already use - not a "translated" Tamil sentence with vernacular words.
+   Conventions (confirmed against a real family sankalpa vakyam sample):
+     - s -> ஸ, ṣ -> ஷ, ś -> ச (plain cha, not the rarer Grantha ஶ)
+     - No aspirate distinction (Tamil script doesn't have one): kh/gh -> க
+       (same as k/g), th/dh -> த, ph/bh -> ப, ch/jh -> ச/ஜ, ṭh/ḍh -> ட
+     - Vocalic ṛ: word-initial -> ரு ; after a consonant -> that consonant
+       gets an i-matra, followed by a separate ரு syllable (matches the
+       conventional Tamil rendering of e.g. "kṛṣṇa" -> "கிருஷ்ண")
+*/
+function iastToTamil(str) {
+    if (!str) return '';
+    str = str.toLowerCase()
+        .replace(/kh/g, 'k').replace(/gh/g, 'g')
+        .replace(/ch/g, 'c').replace(/jh/g, 'j')
+        .replace(/ṭh/g, 'ṭ').replace(/ḍh/g, 'ḍ')
+        .replace(/th/g, 't').replace(/dh/g, 'd')
+        .replace(/ph/g, 'p').replace(/bh/g, 'b');
+
+    const CONS = {
+        'k':'க','g':'க','ṅ':'ங',
+        'c':'ச','j':'ஜ','ñ':'ஞ',
+        'ṭ':'ட','ḍ':'ட','ṇ':'ண',
+        't':'த','d':'த','n':'ந',
+        'p':'ப','b':'ப','m':'ம',
+        'y':'ய','r':'ர','l':'ல','v':'வ',
+        'ś':'ச','ṣ':'ஷ','s':'ஸ','h':'ஹ','ḷ':'ள'
+    };
+    const V_MATRA = {'a':'','ā':'ா','i':'ி','ī':'ீ','u':'ு','ū':'ூ','e':'ே','ai':'ை','o':'ோ','au':'ௌ'};
+    const V_INDEP = {'a':'அ','ā':'ஆ','i':'இ','ī':'ஈ','u':'உ','ū':'ஊ','e':'ஏ','ai':'ஐ','o':'ஓ','au':'ஔ'};
+    const PULLI = '\u0BCD';
+    const consKeys = Object.keys(CONS);
+    const vowelKeys = ['ai','au','ā','ī','ū','a','i','u','e','o'];
+
+    const tokens = [];
+    let i = 0;
+    while (i < str.length) {
+        if (str[i] === ' ' || str[i] === '-') { tokens.push({t:'SPACE'}); i++; continue; }
+        if (str[i] === 'ṃ') { tokens.push({t:'M'}); i++; continue; }
+        if (str[i] === 'ḥ') { tokens.push({t:'H'}); i++; continue; }
+        if (str[i] === 'ṛ') { tokens.push({t:'RVOWEL'}); i++; continue; }
+        let matched = false;
+        for (const v of vowelKeys) {
+            if (str.startsWith(v, i)) { tokens.push({t:'V', v}); i += v.length; matched = true; break; }
+        }
+        if (matched) continue;
+        for (const c of consKeys) {
+            if (str.startsWith(c, i)) { tokens.push({t:'C', c}); i += c.length; matched = true; break; }
+        }
+        if (matched) continue;
+        i++;
+    }
+
+    let out = '', j = 0;
+    while (j < tokens.length) {
+        const tok = tokens[j];
+        if (tok.t === 'SPACE') { out += ' '; j++; continue; }
+        if (tok.t === 'M') { out += 'ம' + PULLI; j++; continue; }
+        if (tok.t === 'H') { out += 'ஃ'; j++; continue; }
+        if (tok.t === 'V') { out += V_INDEP[tok.v]; j++; continue; }
+        if (tok.t === 'RVOWEL') {
+            const prev = tokens[j - 1];
+            if (prev && prev.t === 'C') out += CONS[prev.c] + V_MATRA['i'] + 'ர' + V_MATRA['u'];
+            else out += 'ர' + V_MATRA['u'];
+            j++; continue;
+        }
+        if (tok.t === 'C') {
+            const next = tokens[j + 1];
+            if (next && next.t === 'V') { out += CONS[tok.c] + V_MATRA[next.v]; j += 2; }
+            else if (next && next.t === 'RVOWEL') { j++; }
+            else { out += CONS[tok.c] + PULLI; j++; }
+            continue;
+        }
+        j++;
+    }
+    return out;
+}
+
 const IAST_NAKSHATRAS = [
     "aśvinī", "bharaṇī", "kṛttikā", "rohiṇī", "mṛgaśīrṣa", "ārdrā",
     "punarvasu", "puṣya", "āśleṣā", "maghā", "pūrvaphalgunī", "uttaraphalgunī",
     "hasta", "citrā", "svāti", "viśākhā", "anurādhā", "jyeṣṭhā",
-    "mūla", "pūrvāṣāḍhā", "uttarāṣāḍhā", "śravaṇa", "dhaniṣṭhā", "śatabhiṣā",
+    "mūla", "pūrvāṣāḍhā", "uttarāṣāḍhā", "śravaṇa", "dhaniṣṭhā", "śatabhiṣak",
     "pūrvabhādrapadā", "uttarabhādrapadā", "revatī"
 ];
 
@@ -812,6 +899,10 @@ async function getPanchang(dateStr, timeStr, timezone) {
     p.tithi.iast_locative = p.tithi.index === 29
         ? IAST_AMAVASYA_LOC
         : IAST_TITHIS_LOC[p.tithi.index < 15 ? p.tithi.index : p.tithi.index - 15];
+    p.tithi.deva_locative = p.tithi.index === 29
+        ? DEVA_AMAVASYA_LOC
+        : DEVA_TITHIS_LOC[p.tithi.index < 15 ? p.tithi.index : p.tithi.index - 15];
+    p.tithi.tamil_locative = iastToTamil(p.tithi.iast_locative);
     p.vasara.iast = IAST_VASARAS[p.vasara.index];
     p.nakshatra.iast = IAST_NAKSHATRAS[p.nakshatra.index];
     p.yoga.iast = IAST_YOGAS[p.yoga.index];

@@ -368,38 +368,38 @@ async function calculate(){
 
 function displayResults(p){
   const fl = (key, html) => `<a href="formulae.html#${key}" class="term-link">${html}</a>`;
+  const loc = w => w.endsWith('a') ? w.slice(0,-1)+'e' : w;
   document.getElementById('deva-content').innerHTML = `
-    <div class="line">${fl('samvatsara', p.samvatsara.sanskrit_script)} संवत्सरे</div>
+    <div class="line">${fl('samvatsara', p.samvatsara.sanskrit_script)} नाम संवत्सरे</div>
     <div class="line">${fl('ayana', p.ayana.sanskrit_script)}े</div>
     <div class="line">${fl('ritu', p.ritu.sanskrit_script)} ऋतौ</div>
     <div class="line">${fl('masa', p.masa.sanskrit_script)} मासे</div>
     <div class="line">${fl('paksha', p.paksha.sanskrit_script)} पक्षे</div>
-    <div class="line">${fl('tithi', p.tithi.sanskrit_script)} शुभ तिथौ</div>
+    <div class="line">${fl('tithi', p.tithi.deva_locative)} पुण्य तिथौ</div>
     <div class="line">${fl('vasara', p.vasara.sanskrit_script)} वासर युक्तायाम्</div>
     <div class="line">${fl('nakshatra', p.nakshatra.sanskrit_script)} नक्षत्र युक्तायाम्</div>
     <div class="line">${fl('yoga', p.yoga.sanskrit_script)} योगे</div>
     <div class="line">${fl('karana', p.karana.sanskrit_script)} करणे</div>`;
 
   document.getElementById('tamil-content').innerHTML = `
-    <div class="line">${fl('samvatsara', p.samvatsara.tamil_script)} வருடம்</div>
-    <div class="line">${fl('ayana', p.ayana.tamil_script)}</div>
-    <div class="line">${fl('ritu', p.ritu.tamil_script)} ருது</div>
-    <div class="line">${fl('masa', p.masa.tamil_script)} மாதம்</div>
-    <div class="line">${fl('paksha', p.paksha.tamil_script)} பக்ஷம்</div>
-    <div class="line">${fl('tithi', p.tithi.tamil_script)} திதி</div>
-    <div class="line">${fl('vasara', p.vasara.tamil_script)} கிழமை</div>
-    <div class="line">${fl('nakshatra', p.nakshatra.tamil_script)} நக்ஷத்திரம்</div>
-    <div class="line">${fl('yoga', p.yoga.tamil_script)} யோகம்</div>
-    <div class="line">${fl('karana', p.karana.tamil_script)} கரணம்</div>`;
+    <div class="line">${fl('samvatsara', iastToTamil(p.samvatsara.iast))} ${iastToTamil('nāma saṃvatsare')}</div>
+    <div class="line">${fl('ayana', iastToTamil(loc(p.ayana.iast)))}</div>
+    <div class="line">${fl('ritu', iastToTamil(p.ritu.iast))} ${iastToTamil('ṛtau')}</div>
+    <div class="line">${fl('masa', iastToTamil(p.masa.iast))} ${iastToTamil('māse')}</div>
+    <div class="line">${fl('paksha', iastToTamil(p.paksha.iast))} ${iastToTamil('pakṣe')}</div>
+    <div class="line">${fl('tithi', p.tithi.tamil_locative)} ${iastToTamil('puṇya tithau')}</div>
+    <div class="line">${fl('vasara', iastToTamil(p.vasara.iast))} ${iastToTamil('vāsara yuktāyām')}</div>
+    <div class="line">${fl('nakshatra', iastToTamil(p.nakshatra.iast))} ${iastToTamil('nakṣatra yuktāyām')}</div>
+    <div class="line">${fl('yoga', iastToTamil(p.yoga.iast))} ${iastToTamil('yoge')}</div>
+    <div class="line">${fl('karana', iastToTamil(p.karana.iast))} ${iastToTamil('karaṇe')}</div>`;
 
-  const loc = w => w.endsWith('a') ? w.slice(0,-1)+'e' : w;
   document.getElementById('iast-content').innerHTML = `
-    <div class="line"><span class="gloss">year</span>${fl('samvatsara', p.samvatsara.iast)} saṃvatsare</div>
+    <div class="line"><span class="gloss">year</span>${fl('samvatsara', p.samvatsara.iast)} nāma saṃvatsare</div>
     <div class="line"><span class="gloss">ayana</span>${fl('ayana', loc(p.ayana.iast))}</div>
     <div class="line"><span class="gloss">season</span>${fl('ritu', p.ritu.iast)} ṛtau</div>
     <div class="line"><span class="gloss">month</span>${fl('masa', p.masa.iast)} māse</div>
     <div class="line"><span class="gloss">fortnight</span>${fl('paksha', p.paksha.iast)} pakṣe</div>
-    <div class="line"><span class="gloss">tithi</span>${fl('tithi', p.tithi.iast)} śubha tithau</div>
+    <div class="line"><span class="gloss">tithi</span>${fl('tithi', p.tithi.iast_locative)} puṇya tithau</div>
     <div class="line"><span class="gloss">weekday</span>${fl('vasara', p.vasara.iast)} vāsara yuktāyām</div>
     <div class="line"><span class="gloss">nakṣatra</span>${fl('nakshatra', p.nakshatra.iast)} nakṣatra yuktāyām</div>
     <div class="line"><span class="gloss">yoga</span>${fl('yoga', p.yoga.iast)} yoge</div>
